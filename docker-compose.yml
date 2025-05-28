@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: php-fpm_symfony
+    volumes:
+      - ./:/var/www/html
+    expose:
+      - "9000"
+    networks:
+      - app-network
+    #Etablir la connexion avec MySQL
+    depends_on:
+      - db
+
+  webserver:
+    image: nginx:alpine
+    container_name: nginx_symfony
+    ports:
+      - "90:80"
+    volumes:
+      - ./:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - app-network
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_symfony
+    environment:
+      MYSQL_ROOT_PASSWORD: Ag1805Sz0602@
+      MYSQL_DATABASE: ProjetSymfony
+      MYSQL_USER: Amelie
+      MYSQL_PASSWORD: Ag1805Sz0602@
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.2
+    container_name: phpmyadmin_symfony
+    environment:
+      PMA_HOST: db
+      PMA_USER: Amelie
+      PMA_PASSWORD: Ag1805Sz0602@
+    ports:
+      - "8090:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+
+
